@@ -1,4 +1,0 @@
-joblib
-numpy
-Pillow
-scikit-learn
