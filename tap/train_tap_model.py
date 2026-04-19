@@ -23,12 +23,18 @@ NON_FEATURE_COLUMNS = {
     "session_id",
     "session_month",
     "parkinsons",
+    "birth_year",
     "gender",
+    "tremors",
+    "diagnosis_year",
     "sided",
-    "impact",
     "updrs",
+    "impact",
+    "levadopa",
+    "da",
+    "maob",
+    "other_med",
 }
-
 
 def prepare_features_and_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, list[str]]:
     feature_columns = [

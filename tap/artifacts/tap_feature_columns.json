@@ -43,12 +43,5 @@
   "special_key_prop",
   "hold_mean_delta_second_half",
   "latency_mean_delta_second_half",
-  "flight_mean_delta_second_half",
-  "birth_year",
-  "tremors",
-  "diagnosis_year",
-  "levadopa",
-  "da",
-  "maob",
-  "other_med"
+  "flight_mean_delta_second_half"
 ]
