@@ -9,7 +9,7 @@ import pandas as pd
 
 from .config import get_default_paths
 from .feature_engineering import compute_session_features
-from ..model_contract import build_modality_result
+from .model_contract import build_modality_result
 
 
 def load_tap_model(artifacts_dir: str | Path | None = None) -> tuple[Any, list[str]]:
