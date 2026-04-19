@@ -1,2 +1,0 @@
-"""ParkSense research prototype package."""
-

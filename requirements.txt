@@ -1,6 +1,4 @@
 joblib
 numpy
-pandas
 Pillow
 scikit-learn
-scipy
