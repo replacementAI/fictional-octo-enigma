@@ -4,8 +4,6 @@ import argparse
 import json
 import random
 from dataclasses import dataclass
-from http import HTTPStatus
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Iterable
 
@@ -360,58 +358,6 @@ def screen(spiral_image_path: str | None, voice_score: float | None, tapping_sco
     return payload
 
 
-class AppHandler(BaseHTTPRequestHandler):
-    def _send_json(self, status: HTTPStatus, payload: dict[str, object]) -> None:
-        body = json.dumps(payload).encode("utf-8")
-        self.send_response(status.value)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
-    def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/health":
-            self._send_json(
-                HTTPStatus.OK,
-                {"status": "ok", "model_ready": MODEL_PATH.exists(), "model_path": str(MODEL_PATH)},
-            )
-            return
-        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Route not found"})
-
-    def do_POST(self) -> None:  # noqa: N802
-        content_length = int(self.headers.get("Content-Length", "0"))
-        try:
-            payload = json.loads(self.rfile.read(content_length) or b"{}")
-        except json.JSONDecodeError:
-            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Request body must be valid JSON"})
-            return
-
-        if self.path == "/predict":
-            try:
-                response = screen(
-                    spiral_image_path=payload.get("spiral_image_path"),
-                    voice_score=payload.get("voice_score"),
-                    tapping_score=payload.get("tapping_score"),
-                )
-            except Exception as exc:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
-                return
-            self._send_json(HTTPStatus.OK, response)
-            return
-
-        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Route not found"})
-
-    def log_message(self, format: str, *args: object) -> None:
-        return
-
-
-def serve(host: str, port: int) -> None:
-    server = ThreadingHTTPServer((host, port), AppHandler)
-    print(f"Serving drawingRFmodel on http://{host}:{port}")
-    print("Routes: GET /health, POST /predict")
-    server.serve_forever()
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="drawingRFmodel single-file app")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -426,10 +372,6 @@ def build_parser() -> argparse.ArgumentParser:
     screen_parser.add_argument("--voice-score", type=float, default=None)
     screen_parser.add_argument("--tapping-score", type=float, default=None)
 
-    serve_parser = subparsers.add_parser("serve", help="Serve a tiny HTTP API for UI integration.")
-    serve_parser.add_argument("--host", default="127.0.0.1")
-    serve_parser.add_argument("--port", type=int, default=8000)
-
     return parser
 
 
@@ -439,11 +381,8 @@ def main() -> None:
 
     if args.command == "train":
         payload = train_model(args.data_dir, image_size=args.image_size, seed=args.seed)
-    elif args.command == "screen":
-        payload = screen(args.spiral_image_path, args.voice_score, args.tapping_score)
     else:
-        serve(args.host, args.port)
-        return
+        payload = screen(args.spiral_image_path, args.voice_score, args.tapping_score)
 
     print(json.dumps(payload, indent=2))
 
