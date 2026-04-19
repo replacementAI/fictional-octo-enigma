@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
+# Local generated outputs
+artifacts/blank_spiral_test.png
+
+# Large local archives
+archive.zip
+data/archive.zip
+
+# OS/editor noise
+.idea/
+.vscode/
