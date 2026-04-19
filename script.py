@@ -1,3 +1,5 @@
+#pip install praat-parselmouth
+
 import pandas as pd
 import parselmouth
 from parselmouth.praat import call
